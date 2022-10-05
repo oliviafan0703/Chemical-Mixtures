@@ -263,6 +263,28 @@ nhanes_na_removed<-cbind(nhanes1518[1:5],nhanes1518$BMXBMI)
 summary(lm(nhanes1518$BMXBMI ~ .^2, data = nhanes_na_removed))
 ```
 
+## 7. Categorical Variable
+
+```{r}
+nhanes_na_removed<-cbind(nhanes1518[1:5],nhanes1518$BMXBMI, nhanes1518$INDHHIN2)
+nhanes_income <- dplyr::rename(nhanes_na_removed,income = "nhanes1518$INDHHIN2")%>% na.omit()
+nhanes_income <- dplyr::rename(nhanes_income,BMI = "nhanes1518$BMXBMI")
+# turn quantitative variable into categorical variable
+nhanes_income$income<-as.character(nhanes_income$income)
+```
+Now we explore the effect of income as a categorical predictor variable on the response BMI. Refer to the website for encoding of income categories:
+
+https://wwwn.cdc.gov/nchs/nhanes/2011-2012/demo_g.htm#INDHHIN2
+
+
+```{r}
+summary(lm(BMI ~ income, data = nhanes_income))
+```
+*Baseline*:
+
+*Model Interpretation*:
+`income6`: 
+
 ## Related Topics
 
 | **Topics** | **Concepts** |
