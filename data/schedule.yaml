@@ -6,7 +6,7 @@ lessons:
     date: ""
     title: "Introduction of problems and methods"
     prepare: "topic-00-intro.html"
-    slides: ""
+    slides: "02-Linear_Regression.html"
     ae: ""
     lab: ""
   - week: "lr"
