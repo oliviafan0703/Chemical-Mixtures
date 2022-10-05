@@ -280,10 +280,10 @@ https://wwwn.cdc.gov/nchs/nhanes/2011-2012/demo_g.htm#INDHHIN2
 ```{r}
 summary(lm(BMI ~ income, data = nhanes_income))
 ```
-*Baseline*:
+*Baseline*: income 1 corresponding to a household income of 0 to 4,999 dollars.
 
 *Model Interpretation*:
-`income6`: 
+`income6`: The coeffcient for the predictor 1.1473 means that for participants with household income category 6 (25,000 to 34,999 dollars per ear), the BMI is expected to be 1.1473 higher than that of participants with household income in category 1 (0 to 4,999 dollars), on average.
 
 ## Related Topics
 
