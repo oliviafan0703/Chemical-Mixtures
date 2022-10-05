@@ -1,0 +1,49 @@
+---
+title: Additional Resources and Tips
+---
+
+
+
+<div id="additional-resources" class="section level2">
+<h2>Additional resources</h2>
+<ul>
+<li><a href="https://r4ds.had.co.nz/">R for Data Science</a></li>
+<li><a href="https://bookdown.org/yihui/rmarkdown-cookbook/">R Markdown Cookbook</a></li>
+<li><a href="https://slides.yihui.org/xaringan/#1">Slides in R using Xaringan</a></li>
+<li>Data visualization
+<ul>
+<li><a href="https://ggplot2.tidyverse.org/reference/index.html">ggplot2 Reference</a></li>
+<li><a href="https://ggplot2-book.org/">ggplot2: Elegant Graphics for Data Analysis</a></li>
+<li><a href="https://socviz.co/index.html">Data Visualization: A Practice Introduction</a></li>
+<li><a href="https://patchwork.data-imaginist.com/index.html">Patchwork R Package</a></li>
+</ul></li>
+</ul>
+<div id="formatting-communication-tips" class="section level3">
+<h3>Formatting + communication tips</h3>
+<ul>
+<li>Include R code in website</li>
+</ul>
+<pre class="r"><code>knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE, 
+                      message = FALSE)</code></pre>
+<ul>
+<li><p>See <a href="https://bookdown.org/yihui/rmarkdown-cookbook/bibliography.html">Section 4.5</a> of the R Markdown Cookbook to learn about the citation functionality in R Markdown.</p></li>
+<li><p>Resize plots and figures, so you have more space for the narrative.</p>
+<ul>
+<li><strong>Resize individual figures</strong>: Use the code chunk header <code>{r plot1, fig.height = 3, fig.width = 5}</code>, replacing <code>plot1</code> with a meaningful label and the height and width with values appropriate for your write up.</li>
+<li><strong>Resize all figures</strong>: Include the <code>fig_width</code> and <code>fig_height</code> options in your YAML header as shown below:</li>
+</ul></li>
+</ul>
+<pre><code>---
+title: &quot;Your Title&quot;
+author: &quot;Team Name + Group Members&quot;
+output: 
+  pdf_document:
+    fig_width: 5
+    fig_height: 3
+---</code></pre>
+<ul>
+<li>If you’re using ggplot2 functions, the <code>patchwork</code> package makes it easy to arrange plots in a grid. See the documentation and examples <a href="https://patchwork.data-imaginist.com/">here</a>.</li>
+</ul>
+</div>
+</div>

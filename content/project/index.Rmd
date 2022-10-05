@@ -1,0 +1,30 @@
+---
+title: "Research Project"
+editor_options:
+  markdown:
+    wrap: sentence
+---
+
+```{r include = F}
+library(tidyverse)
+library(knitr)
+library(broom)
+```
+
+
+## Timeline 
+
+[Topic ideas](#topic-ideas) due **Monday, October 11**
+
+## Introduction 
+
+The tutorials will mainly be based on materials from NIEHS 2015 workshop and PRIME program. This research project is supported by [Superfund Research Center at Duke University](https://sites.nicholas.duke.edu/superfund/).
+
+### NIEHS 2015 workshop
+
+In 2015, the National Institute of Environmental Health Sciences (NIEHS) convened a workshop to bring together experts to **identify and compare statistical approaches for analyzing chemical mixture data in epidemiological studies**. The collection of abstract, codes, and datasets from the workshop are all available on the [NIEHS website](https://www.niehs.nih.gov/news/events/pastmtg/2015/statistical/index.cfm). 
+
+### PRIME Program
+
+NIEHS also launched a funding initiative to **address the analytical challenges of environmental mixtures research**, called Powering Research through Innovative methods for Mixtures in Epidemiology (PRIME) program. Various new statistical methods supported by the NIEHS PRIME Program are available in [Github](https://github.com/niehs-prime/).
+
