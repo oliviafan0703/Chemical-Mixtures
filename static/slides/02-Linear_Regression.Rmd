@@ -58,6 +58,17 @@ names(nhanes1518)
 We will first explore the dataset by doing exploratory data analysts on the predictor variable `age`:
 
 ```{r}
+# observations with age = 0
+nhanes1518%>%filter(RIDAGEYR==0)
+```
+
+With the number of 0 age observations, we want to limit our attention to adults to investigate the effect of age on BMI
+
+```{r}
+nhanes1518 <- nhanes1518%>%filter(RIDAGEYR>=18)
+```
+
+```{r}
 # Basic histogram
 ggplot(nhanes1518, aes(x=RIDAGEYR)) + geom_histogram()+labs(x = "waist circumference", title = "Distribution of Age")
 # Change the width of bins
@@ -66,11 +77,8 @@ ggplot(nhanes1518, aes(x=RIDAGEYR)) +
 # Change colors
 p<-ggplot(nhanes1518, aes(x=RIDAGEYR)) + 
   geom_histogram(color="black", fill="white")+labs(x = "Age", title = "Distribution of Age")
-
-# observations with age = 0
-library(stats)
-nhanes1518%>%filter(RIDAGEYR==0)
 ```
+
 
 We see that the distribution of waist circumference is asymmetric, with peaks at age of around 80 and 0 respectively.
 
@@ -293,12 +301,14 @@ Then we fit the linear regression on categorical variable `income`:
 ```{r}
 summary(lm(BMI ~ income, data = nhanes_income))
 ```
+
 *Baseline*: income category 1 corresponding to a household income of 0 to 4,999 dollars.
 
 *Model Interpretation*:
+
 - Intercept: The intercept 25.6489 means that for people in the baseline income category (income category 1 corresponding to a household income of 0 to 4,999 dollars), the BMI is expected to be 25.6489 on average.
 
-`income6`: The coeffcient for the predictor `income6` is 1.1473, which means that for participants with household income category 6 (25,000 to 34,999 dollars per ear), the BMI is expected to be 1.1473 higher than that of participants with household income in category 1 (0 to 4,999 dollars), on average.
+- `income6`: The coeffcient for the predictor `income6` is 1.1473, which means that for participants with household income category 6 (25,000 to 34,999 dollars per ear), the BMI is expected to be 1.1473 higher than that of participants with household income in category 1 (0 to 4,999 dollars), on average.
 
 ## Related Topics
 
