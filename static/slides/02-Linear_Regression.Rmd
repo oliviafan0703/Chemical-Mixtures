@@ -36,7 +36,7 @@ The ``library()`` function is used to access functionality that is provided by R
 First, load the package ``ggplot2`` that will be used throughout the tutorial for data visualizations.
 
 ```{r}
-library(ggplot2)
+library(tidyverse)
 ```
 
 
@@ -55,29 +55,33 @@ head(nhanes1518)
 names(nhanes1518)
 ```
 
-We will first explore the dataset by doing exploratory data analysts on the predictor variable `BMXWAIST`:
+We will first explore the dataset by doing exploratory data analysts on the predictor variable `age`:
 
 ```{r}
 # Basic histogram
-ggplot(nhanes1518, aes(x=BMXWAIST)) + geom_histogram()+labs(x = "waist circumference", title = "distribution of waist circumference")
+ggplot(nhanes1518, aes(x=RIDAGEYR)) + geom_histogram()+labs(x = "waist circumference", title = "Distribution of Age")
 # Change the width of bins
-ggplot(nhanes1518, aes(x=BMXWAIST)) + 
-  geom_histogram(binwidth=1)+labs(x = "waist circumference", title = "distribution of waist circumference")
+ggplot(nhanes1518, aes(x=RIDAGEYR)) + 
+  geom_histogram(binwidth=1)+labs(x = "Age", title = "Distribution of Age")
 # Change colors
-p<-ggplot(nhanes1518, aes(x=BMXWAIST)) + 
-  geom_histogram(color="black", fill="white")+labs(x = "waist circumference", title = "distribution of waist circumference")
+p<-ggplot(nhanes1518, aes(x=RIDAGEYR)) + 
+  geom_histogram(color="black", fill="white")+labs(x = "Age", title = "Distribution of Age")
+
+# observations with age = 0
+library(stats)
+nhanes1518%>%filter(RIDAGEYR==0)
 ```
 
-We see that the distribution of waist circumference is bimodal, with peaks at waist circumference of around 50 and 100 inches respectively.
+We see that the distribution of waist circumference is asymmetric, with peaks at age of around 80 and 0 respectively.
 
 We can also add the mean line, as well as overlay with transparent density plot. The value of alpha controls the level of transparency:
 
 ```{r}
 # Add mean line
-p+geom_vline(aes(xintercept=mean(BMXWAIST)),
+p+geom_vline(aes(xintercept=mean(RIDAGEYR)),
             color="blue", linetype="dashed", size=1)
 # Histogram with density plot
-ggplot(nhanes1518, aes(x=BMXWAIST)) + 
+ggplot(nhanes1518, aes(x=RIDAGEYR)) + 
  geom_histogram(aes(y=..density..), colour="black", fill="white")+
  geom_density(alpha=.2, fill="#FF6666") 
 ```
@@ -85,10 +89,10 @@ ggplot(nhanes1518, aes(x=BMXWAIST)) +
 
 ## 3. Simple Linear Regression
 
-We'll start with a fitting a simple linear model using the ``lm()`` function.  Instead of attaching the ``nhanes1518`` dataset, we also can specify the data from the ``lm()`` function. In the ``lm()`` function, the first variable is the response variable and the variables to the right of the ``~`` symbol are the predictor variable(s).
+We'll start with a fitting a simple linear model using the ``lm()`` function.  Instead of attaching the ``nhanes1518`` dataset, we also can specify the data from the ``lm()`` function. In the ``lm()`` function, the first variable is the response variable and the variables to the right of the ``~`` symbol are the predictor variable(s). Here we use age as the response, and BMI as the predictor variables.
 
 ```{r}
-lm.fit <- lm(BMXBMI ~ BMXWAIST, data = nhanes1518)
+lm.fit <- lm(RIDAGEYR ~ BMXBMI, data = nhanes1518)
 ```
 
 
@@ -120,15 +124,16 @@ confint(lm.fit)
 We can use the ``predict()`` function to obtain prediction intervals or confidence intervals for a given value of the predictor variable, ``BMXWAIST``.  Note that when using the predict function, the column names and format of the new points at which to predict needs to be the same as the original data frame used to fit the ``lm()`` model.  If you encounter errors using the ``predict()`` function, this is a good first thing to check.
 
 ```{r}
-predict(lm.fit, data.frame(BMXWAIST = (c(70, 80, 90))), interval = "confidence")
-predict(lm.fit, data.frame(BMXWAIST = (c(70, 80, 90))), interval = "prediction")
+predict(lm.fit, data.frame(BMXBMI = (c(70, 80, 90))), interval = "confidence")
+predict(lm.fit, data.frame(BMXBMI = (c(70, 80, 90))), interval = "prediction")
 ```
 
 
 We can plot the variables ``BMXBMI`` and ``BMXWAIST`` using the ``plot()`` function and overlay the regression line found using ``lm()`` with the ``abline()`` function.
 
 ```{r}
-plot(x=nhanes1518$BMXWAIST,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)")
+
+plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Age",ylab="Body Mass Index (kg/m**2)")
 abline(lm.fit)
 ```
 
@@ -137,22 +142,22 @@ Here the dollar sign specifies that we retrieve the predictor columns `BMXBMI` a
 We can experiment with different options for ``abline()`` by changing the line width and color in ``abline()``.
 
 ```{r}
-plot(x=nhanes1518$BMXWAIST,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)")
+plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)")
 abline(lm.fit, lwd = 3, col = "red")
 ```
 
 ```{r}
-plot(x=nhanes1518$BMXWAIST,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)", col = "red")
+plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)", col = "red")
 ```
 
 The ``pch`` argument in ``plot()`` changes the shape/type of the points that are plotted.
 
 ```{r}
-plot(x=nhanes1518$BMXWAIST,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)",pch = 20)
+plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)",pch = 20)
 ```
 
 ```{r}
-plot(x=nhanes1518$BMXWAIST,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)",pch = "+")
+plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)",pch = "+")
 ```
 
 
@@ -160,10 +165,10 @@ Optional: We can make a similar plot using ``ggplot``, where we fit the linear r
 
 ```{r}
 library(ggplot2)
-ggplot(nhanes1518, aes(y = BMXBMI, x = BMXWAIST)) + 
+ggplot(nhanes1518, aes(x = RIDAGEYR, y = BMXBMI)) + 
     geom_smooth(method = "lm", formula = y ~ x, colour = "blue") + 
     geom_point() +
-  ggtitle("Waist circumference vs. BMI for the nhanes data")
+  ggtitle("Age vs. BMI for the nhanes data")
 
 ```
 
@@ -201,22 +206,24 @@ The diagnostic plots show residuals in four different ways:
 
 Some other metrics from the model:
 
-- $R^2$: From the model above, we have an adjusted R-squared value of 0.8744, which indicates that 87.44% of the variability in the response variable Body BMI can be explained by the change in the predictor variable waist circumference. 
-- p value: The p value tells us how likely the data we have observed is to have occurred under the null hypothesis (more material on Null hypothesis on subsequent tutorials), i.e. that there is no correlation between the predictor variable waist circumference and the response BMI. From the model above, we have a p value of 2.2e-16, which tells us that the predictor variable waist circumference is statistically significant. 
+- $R^2$: From the model above, we have an adjusted R-squared value of 0.2302, which indicates that 23.02% of the variability in the response variable BMI can be explained by the change in the predictor variable age. 
+- p value: The p value tells us how likely the data we have observed is to have occurred under the null hypothesis (more material on Null hypothesis on subsequent tutorials), i.e. that there is no correlation between the predictor variable age and the response BMI. From the model above, we have a p value of 2.2e-16, which tells us that the predictor variable age is statistically significant. 
 
 ## 5. Multiple Linear Regression
 
-The ``lm()`` function can also fit multiple regression models. In this section, we will use ``BMXWAIST``, `BMXWT`` and ``BMXHT`` as predictors of the response variable ``BMXBMI``.
-
+The ``lm()`` function can also fit multiple regression models. In this section, we will use `RIDAGEYR`, `BMXWAIST`, `BMXWT`, and `BMXHT` as predictors of the response variable ``BMXBMI``.
 
 ```{r}
-lm.fit <- lm(BMXBMI ~ BMXWAIST + BMXWT + BMXHT, data = nhanes1518)
+lm.fit <- lm(BMXBMI ~ RIDAGEYR+ BMXWAIST + BMXWT + BMXHT, data = nhanes1518)
 summary(lm.fit)
 ```
 
-In the lm() formula, a dot . can be used to include all variables in the Boston data as predictors.
+### Model Interpretation:
+- Intercept: The intercept does not have interpretability since it is unrealistic to have age 0, body waist circumference of 0, height and weight of 0.
+- `BMXWT`: The coeffcient for the predictor `BMXWT` is 0.2420969, which means that for every unit increase in the participant's waist circumference, the BMI is expected to increase by 0.2420969 on average, holding all else constant (holding all other predictor variables, `BMXWAIST`, `BMXWT`, and `BMXHT` constant)
+
+In the lm() formula, a dot . can be used to include all variables in the NHANES data as predictors.
 ```{r}
-library(dplyr)
 nhanes_na_removed<-cbind(nhanes1518[1:5],nhanes1518$BMXBMI)
 # data clearning to ignore NA values
 lm.fit1 <- lm(nhanes1518$BMXBMI ~ ., data = nhanes_na_removed)
@@ -276,14 +283,22 @@ Now we explore the effect of income as a categorical predictor variable on the r
 
 https://wwwn.cdc.gov/nchs/nhanes/2011-2012/demo_g.htm#INDHHIN2
 
+We want to first drop categories with values 77 (Refused) and 99 (Don't Know) first:
+```{r}
+nhanes_income <- subset(nhanes_income, income!="77" & income!="99")
+```
+
+Then we fit the linear regression on categorical variable `income`:
 
 ```{r}
 summary(lm(BMI ~ income, data = nhanes_income))
 ```
-*Baseline*: income 1 corresponding to a household income of 0 to 4,999 dollars.
+*Baseline*: income category 1 corresponding to a household income of 0 to 4,999 dollars.
 
 *Model Interpretation*:
-`income6`: The coeffcient for the predictor 1.1473 means that for participants with household income category 6 (25,000 to 34,999 dollars per ear), the BMI is expected to be 1.1473 higher than that of participants with household income in category 1 (0 to 4,999 dollars), on average.
+- Intercept: The intercept 25.6489 means that for people in the baseline income category (income category 1 corresponding to a household income of 0 to 4,999 dollars), the BMI is expected to be 25.6489 on average.
+
+`income6`: The coeffcient for the predictor `income6` is 1.1473, which means that for participants with household income category 6 (25,000 to 34,999 dollars per ear), the BMI is expected to be 1.1473 higher than that of participants with household income in category 1 (0 to 4,999 dollars), on average.
 
 ## Related Topics
 
