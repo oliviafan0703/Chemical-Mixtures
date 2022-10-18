@@ -97,6 +97,11 @@ ggplot(nhanes1518, aes(x=RIDAGEYR)) +
 
 ## 3. Simple Linear Regression
 
+Simple linear regressions take the form
+
+$$Y_i = \beta_0 +\beta_1 X_i +\epsilon_i$$
+Where $Y_i$ is the dependent variable, $X_i$ is the independent variable and $\epsilon_i$ is the random error term.
+
 We'll start with a fitting a simple linear model using the ``lm()`` function.  Instead of attaching the ``nhanes1518`` dataset, we also can specify the data from the ``lm()`` function. In the ``lm()`` function, the first variable is the response variable and the variables to the right of the ``~`` symbol are the predictor variable(s). Here we use age as the response, and BMI as the predictor variables.
 
 ```{r}
@@ -309,6 +314,10 @@ summary(lm(BMI ~ income, data = nhanes_income))
 - Intercept: The intercept 25.6489 means that for people in the baseline income category (income category 1 corresponding to a household income of 0 to 4,999 dollars), the BMI is expected to be 25.6489 on average.
 
 - `income6`: The coeffcient for the predictor `income6` is 1.1473, which means that for participants with household income category 6 (25,000 to 34,999 dollars per ear), the BMI is expected to be 1.1473 higher than that of participants with household income in category 1 (0 to 4,999 dollars), on average.
+
+## 8. Why Multilinear Regressions
+
+Multiple linear regression allows to evaluate the relationship between two variables, while controlling for the effect (i.e., removing the effect) of other variables.
 
 ## Related Topics
 
