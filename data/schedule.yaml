@@ -41,6 +41,6 @@ lessons:
     date: ""
     title: "Bayesian Model Averaging"
     prepare: ""
-    slides: "02-Linear_Regression.html"
+    slides: "07-BMA.html"
     ae: ""
     lab: ""
