@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 ## Background & Introduction 
 
-Traditionally, analysis often proceeds by first selecting the best model according to some criterion and then learning about the parameters given that the selected model is the underlying truth. However, from the Bayesian perspective, an alternative is to learn the parameters for *all* candidate models and then combine the estimates according to pthe posterior probabilities of associated model. In this module, we will investigate this method known as *Bayesian Model Averaging*, and the advantages it has over all-or-none model selection. 
+Traditionally, analysis often proceeds by first selecting the best model according to some criterion and then learning about the parameters given that the selected model is the underlying truth. However, from the Bayesian perspective, an alternative is to learn the parameters for *all* candidate models and then combine the estimates according to the posterior probabilities of associated model. In this module, we will investigate this method known as *Bayesian Model Averaging*, and the advantages it has over all-or-none model selection. 
 
 ## Topics 
 
@@ -48,59 +48,45 @@ library(tidyverse)
 
 ## 2. Example: Linear Regression
 
-This tutorial will be using the ``nhanes`` dataset where the variables are described in the file `nhanes-codebook.txt`. Load this data with the `load` function and specify the rda data file. 
+To illustrate how BMA takes account of model uncertainty about the variables to be included in lin- ear regression, we will be using the ``nhanes`` dataset where the variables are described in the file `nhanes-codebook.txt`. Load this data with the `load` function and specify the data file. 
 
 ```{r}
 load(file='nhanes1518.rda')
 ```
 
-We first look at the 
+<!-- Experimentation with UScrime data: -->
+
+<!-- ```{r} -->
+<!-- UScrime<- MASS::UScrime -->
+<!-- x.crime<- UScrime[,-16] -->
+<!-- y.crime<- log(UScrime[,16]) -->
+<!-- x.crime[,-2]<- log(x.crime[,-2]) -->
+<!-- crime.bicreg <- bicreg(x.crime, y.crime) -->
+<!-- summary (crime.bicreg, digits=2) -->
+<!-- ``` -->
+
+We fit a BMA model on the dataset:
 
 ```{r}
-# length(nhanes1518$RIDAGEYR)
-# bmi.bicreg <- bicreg(nhanes1518$RIDAGEYR, nhanes1518$BMXBMI)
-# summary (crime.bicreg, digits=2)
+x.nhanes <-nhanes1518[1:7]
+y.nhanes <-nhanes1518[,8]
+y.nhanes<-as.numeric(unlist(y.nhanes))
+nhanes.bicreg <- bicreg(x.nhanes, y.nhanes)
+
+summary(nhanes.bicreg)
 ```
 
-We will first explore the dataset by doing exploratory data analysts on the predictor variable `age`:
+
+The BMA posterior distributions of all the parameters are produced by the command:
 
 ```{r}
-# observations with age = 0
-nhanes1518%>%filter(RIDAGEYR==0)
-```
-
-With the number of 0 age observations, we want to limit our attention to adults to investigate the effect of age on BMI
-
-```{r}
-nhanes1518 <- nhanes1518%>%filter(RIDAGEYR>=18)
-```
-
-```{r}
-# Basic histogram
-ggplot(nhanes1518, aes(x=RIDAGEYR)) + geom_histogram()+labs(x = "waist circumference", title = "Distribution of Age")
-# Change the width of bins
-ggplot(nhanes1518, aes(x=RIDAGEYR)) + 
-  geom_histogram(binwidth=1)+labs(x = "Age", title = "Distribution of Age")
-# Change colors
-p<-ggplot(nhanes1518, aes(x=RIDAGEYR)) + 
-  geom_histogram(color="black", fill="white")+labs(x = "Age", title = "Distribution of Age")
+plot (nhanes.bicreg,mfrow=c(4,4))
 ```
 
 
 We see that the distribution of waist circumference is asymmetric, with peaks at age of around 80 and 0 respectively.
 
 We can also add the mean line, as well as overlay with transparent density plot. The value of alpha controls the level of transparency:
-
-```{r}
-# Add mean line
-p+geom_vline(aes(xintercept=mean(RIDAGEYR)),
-            color="blue", linetype="dashed", size=1)
-# Histogram with density plot
-ggplot(nhanes1518, aes(x=RIDAGEYR)) + 
- geom_histogram(aes(y=..density..), colour="black", fill="white")+
- geom_density(alpha=.2, fill="#FF6666") 
-```
-
 
 ## 3. Simple Linear Regression
 
