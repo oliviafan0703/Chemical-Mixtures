@@ -80,7 +80,7 @@ summary(nhanes.bicreg)
 The BMA posterior distributions of all the parameters are produced by the command:
 
 ```{r}
-plot (nhanes.bicreg,mfrow=c(4,4))
+plot (nhanes.bicreg,mfrow=c(3,6))
 ```
 
 
