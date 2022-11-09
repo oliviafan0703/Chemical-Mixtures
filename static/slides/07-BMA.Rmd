@@ -65,14 +65,21 @@ load(file='nhanes1518.rda')
 <!-- summary (crime.bicreg, digits=2) -->
 <!-- ``` -->
 
+We first subset the dataset to include only the predictors in linear regressions module, in order to filter out some NA values:
+
+```{r}
+nhanes_na_removed<-cbind(nhanes1518[1:5],nhanes1518$BMXBMI)%>%
+  rename(BMXBMI="nhanes1518$BMXBMI")%>%
+  na.omit()
+```
+
 We fit a BMA model on the dataset:
 
 ```{r}
-x.nhanes <-nhanes1518[1:7]
-y.nhanes <-nhanes1518[,8]
+x.nhanes <-log(nhanes_na_removed[-6])
+y.nhanes <-log(nhanes_na_removed[6])
 y.nhanes<-as.numeric(unlist(y.nhanes))
 nhanes.bicreg <- bicreg(x.nhanes, y.nhanes)
-
 summary(nhanes.bicreg)
 ```
 
@@ -80,7 +87,7 @@ summary(nhanes.bicreg)
 The BMA posterior distributions of all the parameters are produced by the command:
 
 ```{r}
-plot (nhanes.bicreg,mfrow=c(3,6))
+plot (nhanes.bicreg,mfrow=c(3,2))
 ```
 
 
@@ -88,90 +95,55 @@ We see that the distribution of waist circumference is asymmetric, with peaks at
 
 We can also add the mean line, as well as overlay with transparent density plot. The value of alpha controls the level of transparency:
 
-## 3. Simple Linear Regression
+## Example 2: Logistic Regression
 
-We'll start with a fitting a simple linear model using the ``lm()`` function.  Instead of attaching the ``nhanes1518`` dataset, we also can specify the data from the ``lm()`` function. In the ``lm()`` function, the first variable is the response variable and the variables to the right of the ``~`` symbol are the predictor variable(s). Here we use age as the response, and BMI as the predictor variables.
+Now we illustrate BMA for logistic regression using the categorical variable `income` on the response BMI
 
 ```{r}
-lm.fit <- lm(RIDAGEYR ~ BMXBMI, data = nhanes1518)
+nhanes_na_removed<-cbind(nhanes1518[1:5],nhanes1518$BMXBMI,nhanes1518$RIDAGEYR,nhanes1518$INDHHIN2)%>%
+  rename(BMXBMI="nhanes1518$BMXBMI")%>%
+  rename(income = "nhanes1518$INDHHIN2")%>%
+  rename(RIDAGEYR = "nhanes1518$RIDAGEYR")%>%
+  na.omit()
+# turn quantitative variable into categorical variable
+nhanes_income$income<-as.character(nhanes_income$income)
+```
+
+Refer to the website for encoding of income categories:
+
+https://wwwn.cdc.gov/nchs/nhanes/2011-2012/demo_g.htm#INDHHIN2
+
+We want to first drop categories with values 77 (Refused) and 99 (Don't Know) first:
+```{r}
+nhanes_income <- subset(nhanes_income, income!="77" & income!="99")
+```
+
+Then we transform the variable `RIAGENDR` to be binary:
+```{r}
+nhanes_na_removed<-nhanes_na_removed%>%
+  mutate(Gender_binary=RIAGENDR-1)
+```
+
+Then we fit the Bayesian logistic regression model on predictors including categorical variable `income`:
+
+```{r}
+nhanes.bic.glm<-bic.glm(Gender_binary~income+BMXBMI+WTINT2YR+WTMEC2YR, data=nhanes_na_removed, glm.family="binomial")
+summary(nhanes.bic.glm)
+plot (nhanes.bic.glm,mfrow=c(2,2))
+summary(nhanes.bic.glm, conditional=T, digits=3)
 ```
 
 
-There are several ways that we can examine the model results.  First, we can just call the name of the ``lm()`` model for a brief summary.
+## Example 3: Survival Analysis
 
 ```{r}
-lm.fit
+nhanes_na_removed$WTINT2YR<-log(nhanes_na_removed$WTINT2YR)
+nhanes_na_removed$WTMEC2YR<-log(nhanes_na_removed$WTMEC2YR)
+nhanes_na_removed$BMXBMI<-log(nhanes_na_removed$BMXBMI)
+nhanes_na_removed$WTINT2YR<-log(nhanes_na_removed$WTINT2YR)
+nhanes_na_removed$WTINT2YR<-log(nhanes_na_removed$WTINT2YR)
 ```
 
-We can also use the ``names()`` function to list all of the names of variables in the ``lm.fit`` model:
-
-```{r}
-names(lm.fit)
-```
-
-The ``summary()`` function gives a more extensive overview of the model fit:
-
-```{r}
-summary(lm.fit)
-```
-
-The coefficients of the linear regression model can be extracted using the ``coef()`` function and the confidence interval(s) with the ``confint()`` function.
-
-```{r}
-coef(lm.fit)
-confint(lm.fit)
-```
-
-We can use the ``predict()`` function to obtain prediction intervals or confidence intervals for a given value of the predictor variable, ``BMXWAIST``.  Note that when using the predict function, the column names and format of the new points at which to predict needs to be the same as the original data frame used to fit the ``lm()`` model.  If you encounter errors using the ``predict()`` function, this is a good first thing to check.
-
-```{r}
-predict(lm.fit, data.frame(BMXBMI = (c(70, 80, 90))), interval = "confidence")
-predict(lm.fit, data.frame(BMXBMI = (c(70, 80, 90))), interval = "prediction")
-```
-
-
-We can plot the variables ``BMXBMI`` and ``BMXWAIST`` using the ``plot()`` function and overlay the regression line found using ``lm()`` with the ``abline()`` function.
-
-```{r}
-
-plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Age",ylab="Body Mass Index (kg/m**2)")
-abline(lm.fit)
-```
-
-Here the dollar sign specifies that we retrieve the predictor columns `BMXBMI` and `BMXWAIST` from the dataset `nhanes1518`
-
-We can experiment with different options for ``abline()`` by changing the line width and color in ``abline()``.
-
-```{r}
-plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)")
-abline(lm.fit, lwd = 3, col = "red")
-```
-
-```{r}
-plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)", col = "red")
-```
-
-The ``pch`` argument in ``plot()`` changes the shape/type of the points that are plotted.
-
-```{r}
-plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)",pch = 20)
-```
-
-```{r}
-plot(x=nhanes1518$RIDAGEYR,y=nhanes1518$BMXBMI, xlab="Body Mass Index (kg/m**2)",ylab="Waist Circumference (cm)",pch = "+")
-```
-
-
-Optional: We can make a similar plot using ``ggplot``, where we fit the linear regression model using ``ggplot()``.
-
-```{r}
-library(ggplot2)
-ggplot(nhanes1518, aes(x = RIDAGEYR, y = BMXBMI)) + 
-    geom_smooth(method = "lm", formula = y ~ x, colour = "blue") + 
-    geom_point() +
-  ggtitle("Age vs. BMI for the nhanes data")
-
-```
 
 We can use the ``residuals()`` and ``rstudent()`` functions to extract the residuals and studentized residuals, respectively, from the linear model and plot them along with the predicted values.
 
@@ -273,27 +245,6 @@ summary(lm(nhanes1518$BMXBMI ~ .^2, data = nhanes_na_removed))
 
 ## 7. Categorical Variable
 
-```{r}
-nhanes_na_removed<-cbind(nhanes1518[1:5],nhanes1518$BMXBMI, nhanes1518$INDHHIN2)
-nhanes_income <- dplyr::rename(nhanes_na_removed,income = "nhanes1518$INDHHIN2")%>% na.omit()
-nhanes_income <- dplyr::rename(nhanes_income,BMI = "nhanes1518$BMXBMI")
-# turn quantitative variable into categorical variable
-nhanes_income$income<-as.character(nhanes_income$income)
-```
-Now we explore the effect of income as a categorical predictor variable on the response BMI. Refer to the website for encoding of income categories:
-
-https://wwwn.cdc.gov/nchs/nhanes/2011-2012/demo_g.htm#INDHHIN2
-
-We want to first drop categories with values 77 (Refused) and 99 (Don't Know) first:
-```{r}
-nhanes_income <- subset(nhanes_income, income!="77" & income!="99")
-```
-
-Then we fit the linear regression on categorical variable `income`:
-
-```{r}
-summary(lm(BMI ~ income, data = nhanes_income))
-```
 
 *Baseline*: income category 1 corresponding to a household income of 0 to 4,999 dollars.
 
